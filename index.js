@@ -7,37 +7,44 @@ const port = config.port
 
 app.get('/', (req, res) => {
     (async function() {
-        try {
-            aws.config.setPromisesDependency()
-            aws.config.update({
-            signatureVersion: 'v4',
+        aws.config.s3 = ({
             accessKeyId: config.accessKeyId,
             secretAccessKey: config.secretAccessKey,
+            region: config.region,
             endpoint: config.endpoint,
-            region: config.region
+            signatureVersion: 'v4'
         })
+        let isTruncated = true
+        let startAfter
+
+        let objects = 0
+        let size = 0
+
         const s3 = new aws.S3()
-        const params = {
-            Bucket: config.bucket
-        }
+
+        while(isTruncated) {
+            let params = { Bucket: config.bucket }
+            
+            if(startAfter) {
+                params.StartAfter = startAfter
+            }
         const data = await s3.listObjectsV2(params).promise()
-        let totalsize = data.Contents.reduce((acc, curr) => {
-            return acc + curr.Size / 1024 / 1024 / 1024
-        }, 0)
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'application/json')
-        res.end(JSON.stringify({
-            'objectCount': data.KeyCount,
-            'totalSize': (Math.round(totalsize * 100) / 100)}, null, 2))
-  } catch (err) {
-        console.log(err)
-        res.statusCode = 500
-        res.setHeader('Content-Type', 'application/json')
-        res.end(JSON.stringify({
-            'error': err}, null, 2))
+
+        data.Contents?.forEach((object) => {
+            objects++
+            size += object.Size / 1024 / 1024 / 1024
+        })
+
+        isTruncated = data.IsTruncated
+        if (isTruncated) {
+            startAfter = data.Contents.slice(-1)[0].Key;
+        }
     }
-}())
-})
+    res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59');
+    res.json({ object: objects, size: Number(size.toFixed(2)) })
+    }
+)()}
+)
 
 app.get('*', (req, res) => {
     (async function() {
