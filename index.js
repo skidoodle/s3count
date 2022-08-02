@@ -2,6 +2,7 @@ const express = require('express')
 const aws = require('aws-sdk')
 const app = express()
 const config = require('./config.json')
+
 const port = config.port
 
 app.get('/', (req, res) => {
