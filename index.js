@@ -2,7 +2,6 @@ const express = require('express')
 const aws = require('aws-sdk')
 const app = express()
 const config = require('./config.json')
-
 const port = config.port
 
 app.get('/', async (req, res) => {
@@ -14,8 +13,7 @@ app.get('/', async (req, res) => {
         signatureVersion: 'v4'
     })
     let isTruncated = true
-    let startAfter
-
+    let startAfter = null
     let objects = 0
     let size = 0
 
@@ -36,26 +34,16 @@ app.get('/', async (req, res) => {
 
         isTruncated = data.IsTruncated
         if (isTruncated) {
-            startAfter = data.Contents.slice(-1)[0].Key;
+            startAfter = data.Contents.slice(-1)[0].Key
         }
     }
-    res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59');
-    res.json({ object: objects, size: Number(size.toFixed(2)) })
+    res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
+    res.status(200).json({ object: objects, size: Number(size.toFixed(2)) })
 })
 
 app.get('*', async (req, res) => {
-    try {
-        res.statusCode = 404
-        res.setHeader('Content-Type', 'application/json')
-        res.end(JSON.stringify({
-        'code': 'not_found',
-        'status': '404',
-        'path': req.originalUrl}, null, 1))
-    } catch (err) {
-        console.log(err)
-    }
+    res.status(404).json(404)
 })
-
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
