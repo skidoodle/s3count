@@ -3,14 +3,14 @@ An Express.js app that counts the amount of objects and the size that have been 
 
 ## Installation
 
-Clone the repository with Git
+Clone the repository with [Git](https://git-scm.com/)
 
 ```
 git clone https://github.com/skidoodle/s3count.git
 ```
 
 ## Usage
-Install the dependencies with npm
+Install the dependencies with [npm](https://nodejs.org/)
 ```
 npm install
 ```
