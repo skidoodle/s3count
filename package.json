@@ -1,7 +1,7 @@
 {
   "name": "s3count",
-  "version": "1.0",
-  "description": "counts objects in s3-compatible buckets",
+  "version": "2.6",
+  "description": "An Express.js app that counts the amount of objects and the size that have been used in any S3 compatible solution.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.1084.0",
+    "dotenv": "^16.0.1",
     "express": "^4.17.3"
   }
 }

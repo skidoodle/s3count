@@ -1,15 +1,16 @@
+require('dotenv').config()
+const { PORT, BUCKET, ACCESSKEY, SECRETKEY, ENDPOINT, REGION } = process.env
 const express = require('express')
 const aws = require('aws-sdk')
 const app = express()
-const config = require('./config.json')
-const port = config.port
+const port = PORT
 
 app.get('/', async (req, res) => {
     aws.config.s3 = ({
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-        region: config.region,
-        endpoint: config.endpoint,
+        accessKeyId: ACCESSKEY,
+        secretAccessKey: SECRETKEY,
+        region: REGION,
+        endpoint: ENDPOINT,
         signatureVersion: 'v4'
     })
     let isTruncated = true
@@ -20,7 +21,7 @@ app.get('/', async (req, res) => {
     const s3 = new aws.S3()
 
     while(isTruncated) {
-        let params = { Bucket: config.bucket }
+        let params = { Bucket: BUCKET }
         
         if(startAfter) {
             params.StartAfter = startAfter
