@@ -1,6 +1,6 @@
 # S3Count
 
-An Express.js app that counts the amount of objects and the size that have been used in any S3 compatible solution.
+An Express.js app that counts the amount of objects and the size that have been used in any S3 compatible service.
 
 ## Installation
 
