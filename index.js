@@ -1,32 +1,29 @@
-require("dotenv").config();
+require('dotenv').config();
 const { PORT, BUCKET, ACCESSKEY, SECRETKEY, ENDPOINT, REGION } = process.env;
-const express = require("express");
-const aws = require("aws-sdk");
+const express = require('express');
+const aws = require('aws-sdk');
 const app = express();
 const port = PORT;
 
-app.get("/", async (req, res) => {
-  aws.config.s3 = {
-    accessKeyId: ACCESSKEY,
-    secretAccessKey: SECRETKEY,
-    region: REGION,
-    endpoint: ENDPOINT,
-    signatureVersion: "v4",
-  };
+aws.config.update({
+  accessKeyId: ACCESSKEY,
+  secretAccessKey: SECRETKEY,
+  region: REGION,
+  endpoint: ENDPOINT,
+  signatureVersion: 'v4',
+});
+const s3 = new aws.S3();
+
+app.get('/', async (req, res) => {
   let isTruncated = true;
   let startAfter = null;
   let objects = 0;
   let size = 0;
 
-  const s3 = new aws.S3();
-
   while (isTruncated) {
-    let params = { Bucket: BUCKET };
-
-    if (startAfter) {
-      params.StartAfter = startAfter;
-    }
-    const data = await s3.listObjectsV2(params).promise();
+    const data = await s3
+      .listObjectsV2({ Bucket: BUCKET, StartAfter: startAfter })
+      .promise();
 
     data.Contents?.forEach((object) => {
       objects++;
@@ -39,13 +36,13 @@ app.get("/", async (req, res) => {
     }
   }
   res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=59"
+    'Cache-Control',
+    'public, s-maxage=10, stale-while-revalidate=59'
   );
   res.status(200).json({ object: objects, size: Number(size.toFixed(2)) });
 });
 
-app.get("*", async (req, res) => {
+app.get('*', async (req, res) => {
   res.status(404).json(404);
 });
 

@@ -1,6 +1,6 @@
 # S3Count
 
-An Express.js app that counts the amount of objects and the size that have been used in any S3 compatible service.
+This script is a simple Express.js server that listens on the port specified by the PORT environment variable. When a GET request is made to the root ("/") route, it uses the AWS SDK for JavaScript in Node.js (aws-sdk) to connect to an S3 bucket specified by the BUCKET, ACCESSKEY, SECRETKEY, ENDPOINT, and REGION environment variables. It then uses the listObjectsV2 method to retrieve a list of all objects in the bucket, iterates through the objects, and keeps a count of the number of objects and their total size in GB. The final result is returned in a JSON response with the object count and total size. If any other route is accessed, a 404 status code and JSON response are returned. The server will log that it is running and listening on the specified port.
 
 ## Installation
 
